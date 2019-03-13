@@ -11,9 +11,13 @@ y = train_data.iloc[:,1]
 from sklearn.model_selection import train_test_split
 x_train, x_test, y_train, y_test = train_test_split(X, y, test_size = 0.1)
 
+# Standardization
 from sklearn.preprocessing import StandardScaler
 std = StandardScaler()
 newX = std.fit_transform(X)
+
+from sklearn.model_selection import train_test_split
+x_train_new, x_test_new, y_train, y_test = train_test_split(newX, y, test_size = 0.1)
 
 #### Dimontianality Reduction
 from sklearn.decomposition import PCA
@@ -25,6 +29,9 @@ reduced = pca.fit_transform(newX)
 
 plt.scatter(reduced[:,0],reduced[:,1] , c = y)
 plt.show()
+
+from sklearn.model_selection import train_test_split
+x_train_red, x_test_red, y_train, y_test = train_test_split(reduced, y, test_size = 0.1)
 #################################
 from sklearn.metrics import accuracy_score, f1_score, confusion_matrix
 def score(clf , name):
@@ -48,6 +55,25 @@ from sklearn.svm import SVC
 clf = SVC(kernel = 'rbf', C = 100, gamma = 0.0001)
 clf.fit(x_train, y_train)
 score(clf, 'SVM')
+############################################################
+from sklearn.neighbors import KNeighborsClassifier
+clf = KNeighborsClassifier()
+clf.fit(x_train, y_train)
+score(clf, 'KNN')
+###########################################################
+from sklearn.tree import DecisionTreeClassifier
+clf = DecisionTreeClassifier()
+clf.fit(x_train, y_train)
+score(clf, 'Decision Trees')
+###########################################################
+from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
+clf = RandomForestClassifier()
+clf.fit(x_train, y_train)
+score(clf, 'RandomForest')
+###########################################################
+clf = AdaBoostClassifier()
+clf.fit(x_train, y_train)
+score(clf, "AdaBoost")
 
 ##### Grid Search 
 from sklearn.model_selection import GridSearchCV
@@ -81,24 +107,4 @@ for score in scores:
     y_true, y_pred = y_test, clf.predict(x_test)
     print(classification_report(y_true, y_pred))
     print()
-    
-############################################################
-from sklearn.neighbors import KNeighborsClassifier
-clf = KNeighborsClassifier()
-clf.fit(x_train, y_train)
-score(clf, 'KNN')
-###########################################################
-from sklearn.tree import DecisionTreeClassifier
-clf = DecisionTreeClassifier()
-clf.fit(x_train, y_train)
-score(clf, 'Decision Trees')
-###########################################################
-from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
-clf = RandomForestClassifier()
-clf.fit(x_train, y_train)
-score(clf, 'RandomForest')
-###########################################################
-clf = AdaBoostClassifier()
-clf.fit(x_train, y_train)
-score(clf, "AdaBoost")
     
