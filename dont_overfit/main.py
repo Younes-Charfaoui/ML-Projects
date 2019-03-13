@@ -5,6 +5,9 @@ import matplotlib.pyplot as plt
 train_data = pd.read_csv('train.csv')
 test_data = pd.read_csv('test.csv')
 
+X_test_sub = test_data.iloc[:,1:]
+ids = test_data.iloc[:,0]
+
 X = train_data.iloc[:,2:]
 y = train_data.iloc[:,1]
 
@@ -41,20 +44,24 @@ def score(clf , name):
     f1 = f1_score(y_test, ypred)
     cm = confusion_matrix(y_test, ypred)
     print('Accuracy for {} was {} and F1 was {}'.format(name, accuracy, f1))
-    print('Confusion Matrix of {} was \n{}'.format(name ,cm) )
+    """print('Confusion Matrix of {} was \n{}'.format(name ,cm) )
     #### Training Set
     y_pred_train = clf.predict(x_train)
     accuracy = accuracy_score(y_train, y_pred_train)
     f1 = f1_score(y_train, y_pred_train)
     cm = confusion_matrix(y_train, y_pred_train)
     print('Accuracy for {} was {} and F1 was {}'.format(name, accuracy, f1))
-    print('Confusion Matrix of {} was \n{}'.format(name ,cm) )
+    print('Confusion Matrix of {} was \n{}'.format(name ,cm) )"""
 
 #####################################
 from sklearn.svm import SVC
 clf = SVC(kernel = 'rbf', C = 100, gamma = 0.0001)
 clf.fit(x_train, y_train)
 score(clf, 'SVM')
+y_sub = clf.predict(X_test_sub)
+target_series = pd.Series(y_sub, name= 'target')
+df_submit = pd.concat([ids, target_series], axis =1)
+df_submit.to_csv("submission_one.csv", index = False)
 ############################################################
 from sklearn.neighbors import KNeighborsClassifier
 clf = KNeighborsClassifier()
@@ -74,7 +81,37 @@ score(clf, 'RandomForest')
 clf = AdaBoostClassifier()
 clf.fit(x_train, y_train)
 score(clf, "AdaBoost")
-
+###########################################################
+from sklearn.ensemble import BaggingClassifier
+clf = BaggingClassifier()
+clf.fit(x_train,y_train)
+score(clf, 'BaggingClassifier')
+########## 0.72
+from sklearn.ensemble import BaggingClassifier
+clf2 = BaggingClassifier()
+clf2.fit(x_train,y_train)
+score(clf2, 'BaggingClassifier')
+########## 0.84
+y_sub = clf2.predict(X_test_sub)
+target_series = pd.Series(y_sub, name= 'target')
+df_submit = pd.concat([ids, target_series], axis =1)
+df_submit.to_csv("submission_two.csv", index = False)
+###########################################################
+from sklearn.naive_bayes import GaussianNB
+clf = GaussianNB()
+clf.fit(x_train,y_train)
+score(clf, 'Naive Bayes')
+###########################################################
+from sklearn.linear_model import LogisticRegression
+clf = LogisticRegression()
+clf.fit(x_train,y_train)
+score(clf, 'Logistic Regression')
+###########################################################
+from sklearn.linear_model import SGDClassifier
+clf = SGDClassifier()
+clf.fit(x_train,y_train)
+score(clf, 'SGDClassifier')
+###########################################################
 ##### Grid Search 
 from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import classification_report
