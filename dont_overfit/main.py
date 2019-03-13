@@ -1,0 +1,104 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+train_data = pd.read_csv('train.csv')
+test_data = pd.read_csv('test.csv')
+
+X = train_data.iloc[:,2:]
+y = train_data.iloc[:,1]
+
+from sklearn.model_selection import train_test_split
+x_train, x_test, y_train, y_test = train_test_split(X, y, test_size = 0.1)
+
+from sklearn.preprocessing import StandardScaler
+std = StandardScaler()
+newX = std.fit_transform(X)
+
+#### Dimontianality Reduction
+from sklearn.decomposition import PCA
+pca = PCA(300)
+reduced = pca.fit_transform(X)
+variance = pca.explained_variance_ratio_
+pca = PCA(2)
+reduced = pca.fit_transform(newX)
+
+plt.scatter(reduced[:,0],reduced[:,1] , c = y)
+plt.show()
+#################################
+from sklearn.metrics import accuracy_score, f1_score, confusion_matrix
+def score(clf , name):
+    ypred = clf.predict(x_test)
+    ##### Testing set
+    accuracy = accuracy_score(y_test, ypred)
+    f1 = f1_score(y_test, ypred)
+    cm = confusion_matrix(y_test, ypred)
+    print('Accuracy for {} was {} and F1 was {}'.format(name, accuracy, f1))
+    print('Confusion Matrix of {} was \n{}'.format(name ,cm) )
+    #### Training Set
+    y_pred_train = clf.predict(x_train)
+    accuracy = accuracy_score(y_train, y_pred_train)
+    f1 = f1_score(y_train, y_pred_train)
+    cm = confusion_matrix(y_train, y_pred_train)
+    print('Accuracy for {} was {} and F1 was {}'.format(name, accuracy, f1))
+    print('Confusion Matrix of {} was \n{}'.format(name ,cm) )
+
+#####################################
+from sklearn.svm import SVC
+clf = SVC(kernel = 'rbf', C = 100, gamma = 0.0001)
+clf.fit(x_train, y_train)
+score(clf, 'SVM')
+
+##### Grid Search 
+from sklearn.model_selection import GridSearchCV
+from sklearn.metrics import classification_report
+tuned_parameters = [{'kernel': ['rbf', 'poly','sigmoid'], 'gamma': [1e-3, 1e-4],
+                     'C': [1, 10, 100, 1000]}]
+scores = ['precision', 'recall']
+for score in scores:
+    print("# Tuning hyper-parameters for %s" % score)
+    print()
+    clf = GridSearchCV(SVC(), tuned_parameters, cv=5,
+                       scoring='%s_macro' % score)
+    clf.fit(x_train, y_train)
+    print("Best parameters set found on development set:")
+    print()
+    print(clf.best_params_)
+    print()
+    print("Grid scores on development set:")
+    print()
+    means = clf.cv_results_['mean_test_score']
+    stds = clf.cv_results_['std_test_score']
+    for mean, std, params in zip(means, stds, clf.cv_results_['params']):
+        print("%0.3f (+/-%0.03f) for %r"
+              % (mean, std * 2, params))
+    print()
+    print("Detailed classification report:")
+    print()
+    print("The model is trained on the full development set.")
+    print("The scores are computed on the full evaluation set.")
+    print()
+    y_true, y_pred = y_test, clf.predict(x_test)
+    print(classification_report(y_true, y_pred))
+    print()
+    
+############################################################
+from sklearn.neighbors import KNeighborsClassifier
+clf = KNeighborsClassifier()
+clf.fit(x_train, y_train)
+score(clf, 'KNN')
+###########################################################
+from sklearn.tree import DecisionTreeClassifier
+clf = DecisionTreeClassifier()
+clf.fit(x_train, y_train)
+score(clf, 'Decision Trees')
+###########################################################
+from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
+clf = RandomForestClassifier()
+clf.fit(x_train, y_train)
+score(clf, 'RandomForest')
+###########################################################
+clf = AdaBoostClassifier()
+clf.fit(x_train, y_train)
+score(clf, "AdaBoost")
+    

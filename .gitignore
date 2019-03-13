@@ -1,2 +1,4 @@
 reinforcement_learning/lab-taxi/gym/
 reinforcement_learning/lab-taxi/__pycache__/
+dont_overfit/*.csv
+
