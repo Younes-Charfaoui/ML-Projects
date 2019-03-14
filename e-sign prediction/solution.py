@@ -84,8 +84,9 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier, BaggingClassifier
 from sklearn.naive_bayes import GaussianNB
 from sklearn.neighbors import KNeighborsClassifier
+from sklearn.neural_network import MLPClassifier
 ###########################
-clf_svm = SVC(C = 10, kernel= 'linear')
+clf_svm = SVC(C = 10, kernel= 'rbf', gamma = 0.001)
 clf_svm.fit(x_train, y_train)
 evaluate(clf_svm, result)
 ###########################
@@ -97,11 +98,11 @@ clf_nb = GaussianNB()
 clf_nb.fit(x_train, y_train)
 evaluate(clf_nb)
 ###########################
-clf_dt = DecisionTreeClassifier()
+clf_dt = DecisionTreeClassifier(max_depth = 100)
 clf_dt.fit(x_train, y_train)
 evaluate(clf_dt)
 ###########################
-clf_rf = RandomForestClassifier(n_estimators = 100)
+clf_rf = RandomForestClassifier(n_estimators = 50)
 clf_rf.fit(x_train, y_train)
 evaluate(clf_rf)
 ###########################
@@ -116,3 +117,14 @@ evaluate(clf_bg)
 clf_knn = KNeighborsClassifier(n_neighbors = 100)
 clf_knn.fit(x_train, y_train)
 evaluate(clf_knn)
+###########################
+mlp = MLPClassifier(hidden_layer_sizes=(200,200),max_iter=500)
+mlp.fit(x_train, y_train)
+evaluate(mlp)
+###########################
+from sklearn.model_selection import cross_val_score
+accurcies = cross_val_score(estimator = clf_knn,X = x_train, 
+                            y = y_train, cv = 10)
+
+print("The accuries for 10 Fold: ", accurcies)
+print("The mean accurcy for 10 Fold: ", np.mean(accurcies))
