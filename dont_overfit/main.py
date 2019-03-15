@@ -5,22 +5,25 @@ import matplotlib.pyplot as plt
 train_data = pd.read_csv('train.csv')
 test_data = pd.read_csv('test.csv')
 
-X_test_sub = test_data.iloc[:,1:]
+X_test_sub = test_data.iloc[:,[33,65,24]]
 ids = test_data.iloc[:,0]
 
 X = train_data.iloc[:,2:]
 y = train_data.iloc[:,1]
 
+corr = train_data.corr()
+
+X_cor = train_data.iloc[:,[33,65,24]]
+
 from sklearn.model_selection import train_test_split
-x_train, x_test, y_train, y_test = train_test_split(X, y, test_size = 0.1)
+x_train, x_test, y_train, y_test = train_test_split(X_cor, y, test_size = 0.4)
 
 # Standardization
 from sklearn.preprocessing import StandardScaler
 std = StandardScaler()
-newX = std.fit_transform(X)
+x_train = std.fit_transform(x_train)
+x_test = std.fit_transform(x_test)
 
-from sklearn.model_selection import train_test_split
-x_train_new, x_test_new, y_train, y_test = train_test_split(newX, y, test_size = 0.1)
 
 #### Dimontianality Reduction
 from sklearn.decomposition import PCA
@@ -28,9 +31,9 @@ pca = PCA(300)
 reduced = pca.fit_transform(X)
 variance = pca.explained_variance_ratio_
 pca = PCA(2)
-reduced = pca.fit_transform(newX)
+reduced = pca.fit_transform(x_train)
 
-plt.scatter(reduced[:,0],reduced[:,1] , c = y)
+plt.scatter(reduced[:,0],reduced[:,1] , c = y_train)
 plt.show()
 
 from sklearn.model_selection import train_test_split
@@ -61,7 +64,7 @@ score(clf, 'SVM')
 y_sub = clf.predict(X_test_sub)
 target_series = pd.Series(y_sub, name= 'target')
 df_submit = pd.concat([ids, target_series], axis =1)
-df_submit.to_csv("submission_one.csv", index = False)
+df_submit.to_csv("submission_three.csv", index = False)
 ############################################################
 from sklearn.neighbors import KNeighborsClassifier
 clf = KNeighborsClassifier()
