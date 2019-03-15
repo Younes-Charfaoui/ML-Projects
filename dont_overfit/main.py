@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 train_data = pd.read_csv('train.csv')
 test_data = pd.read_csv('test.csv')
 
-X_test_sub = test_data.iloc[:,[33,65,24]]
+X_test_sub = test_data.iloc[:,1:]
 ids = test_data.iloc[:,0]
 
 X = train_data.iloc[:,2:]
@@ -16,7 +16,7 @@ corr = train_data.corr()
 X_cor = train_data.iloc[:,[33,65,24]]
 
 from sklearn.model_selection import train_test_split
-x_train, x_test, y_train, y_test = train_test_split(X_cor, y, test_size = 0.4)
+x_train, x_test, y_train, y_test = train_test_split(X, y, test_size = 0.5)
 
 # Standardization
 from sklearn.preprocessing import StandardScaler
@@ -64,7 +64,7 @@ score(clf, 'SVM')
 y_sub = clf.predict(X_test_sub)
 target_series = pd.Series(y_sub, name= 'target')
 df_submit = pd.concat([ids, target_series], axis =1)
-df_submit.to_csv("submission_three.csv", index = False)
+df_submit.to_csv("submission_four.csv", index = False)
 ############################################################
 from sklearn.neighbors import KNeighborsClassifier
 clf = KNeighborsClassifier()
