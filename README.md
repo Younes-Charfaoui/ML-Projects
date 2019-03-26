@@ -1,0 +1,2 @@
+# Machine Learning Projects 🤖👨‍🎓
+This Repository contains the code, dataset and projects that I made during the learning of machine learning, including udacity projects, kaggle competitions, other problems from UCI datasets and much more.
